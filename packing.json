@@ -1,0 +1,176 @@
+{
+  "questions": [
+    { "id": "airplane", "label": "Flying?" },
+    { "id": "international", "label": "International travel?" },
+    { "id": "work", "label": "Work or formal event?" },
+    { "id": "summer", "label": "Summer weather?" },
+    { "id": "swimming", "label": "Swimming?" },
+    { "id": "camping", "label": "Camping?" }
+  ],
+  "categories": [
+    {
+      "name": "Clothes - Regular",
+      "tags": ["always"],
+      "items": [
+        "Socks",
+        "Underwear",
+        "Sleeping T Shirt",
+        "T Shirts",
+        "Polos",
+        "Sweater / hoodie",
+        "Shorts",
+        "Glasses"
+      ]
+    },
+    {
+      "name": "Clothes - Work / Fancy",
+      "tags": ["work"],
+      "items": [
+        "Dress shirt",
+        "Dress shoes",
+        "Dress pants"
+      ]
+    },
+    {
+      "name": "Bathroom Bag",
+      "tags": ["always"],
+      "items": [
+        "Allergy spray",
+        "Nasal Spray",
+        "Hair crap",
+        "Toothbrush",
+        "Toothpaste",
+        "Ibuprofen"
+      ]
+    },
+    {
+      "name": "Electronics Bag",
+      "tags": ["always"],
+      "items": [
+        "Apple Watch charger",
+        "iPhone charger",
+        "Micro USB charger",
+        "Multi-USB brick",
+        "Battery brick",
+        "Kindle",
+        "HDMI Cable"
+      ]
+    },
+    {
+      "name": "Before You Leave",
+      "tags": ["always"],
+      "items": [
+        "Set thermostat to away",
+        "Download movies to iPad",
+        "Download google maps offline",
+        "Run dishwasher",
+        "Empty garbages"
+      ]
+    },
+    {
+      "name": "Summer / Swimming",
+      "tags": ["summer", "swimming"],
+      "items": [
+        "Bathing Suit",
+        "Flip-flops",
+        "Towel",
+        "Sunglasses"
+      ]
+    },
+    {
+      "name": "Day Pack",
+      "tags": ["always"],
+      "items": [
+        "Day backpack"
+      ]
+    },
+    {
+      "name": "Airplane",
+      "tags": ["airplane"],
+      "items": [
+        "Passport"
+      ]
+    },
+    {
+      "name": "Work Gear",
+      "tags": ["work"],
+      "items": [
+        "Laptop / charger"
+      ]
+    },
+    {
+      "name": "Camping - Food",
+      "tags": ["camping"],
+      "items": [
+        "1L milk",
+        "Kraft Dinner",
+        "Fruit",
+        "Oatmeal",
+        "Granola bars",
+        "Coffee pre ground",
+        "Oil",
+        "Butter"
+      ]
+    },
+    {
+      "name": "Camping - Sleeping",
+      "tags": ["camping"],
+      "items": [
+        "Sleeping bag",
+        "Air mattress",
+        "Pillows",
+        "Tent",
+        "Air mattress pump",
+        "Mat in front of tent"
+      ]
+    },
+    {
+      "name": "Camping - Misc",
+      "tags": ["camping"],
+      "items": [
+        "Lantern",
+        "Sunscreen",
+        "Leatherman",
+        "Insect spray",
+        "Carabiner",
+        "Dust buster",
+        "Air mattress patches",
+        "Glow in dark tape",
+        "Duct tape",
+        "Velcro ties",
+        "Games",
+        "Frisbee",
+        "Mallet / hammer for stakes",
+        "Rope"
+      ]
+    },
+    {
+      "name": "Camping - Eating Gear",
+      "tags": ["camping"],
+      "items": [
+        "Utensils",
+        "Cutting knife",
+        "Butane tank",
+        "Bowls",
+        "Plates",
+        "Mugs",
+        "Water Jug",
+        "Cook set",
+        "Cooler",
+        "Aeropress",
+        "Filters",
+        "Flipper",
+        "Dish soap",
+        "Dish towel",
+        "Napkins",
+        "Lighter",
+        "Washing bowl",
+        "Washing sponge",
+        "Spatula",
+        "Roasting sticks",
+        "Coleman stove",
+        "Tea kettle"
+      ]
+    }
+  ]
+}
