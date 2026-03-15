@@ -1,16 +1,36 @@
 {
   "questions": [
-    { "id": "airplane", "label": "Flying?" },
-    { "id": "international", "label": "International travel?" },
-    { "id": "work", "label": "Work or formal event?" },
-    { "id": "summer", "label": "Summer weather?" },
-    { "id": "swimming", "label": "Swimming?" },
-    { "id": "camping", "label": "Camping?" }
+    {
+      "id": "airplane",
+      "label": "Flying?"
+    },
+    {
+      "id": "international",
+      "label": "International travel?"
+    },
+    {
+      "id": "work",
+      "label": "Work or formal event?"
+    },
+    {
+      "id": "summer",
+      "label": "Summer weather?"
+    },
+    {
+      "id": "swimming",
+      "label": "Swimming?"
+    },
+    {
+      "id": "camping",
+      "label": "Camping?"
+    }
   ],
   "categories": [
     {
       "name": "Clothes - Regular",
-      "tags": ["always"],
+      "tags": [
+        "always"
+      ],
       "items": [
         "Socks",
         "Underwear",
@@ -24,7 +44,9 @@
     },
     {
       "name": "Clothes - Work / Fancy",
-      "tags": ["work"],
+      "tags": [
+        "work"
+      ],
       "items": [
         "Dress shirt",
         "Dress shoes",
@@ -33,19 +55,23 @@
     },
     {
       "name": "Bathroom Bag",
-      "tags": ["always"],
+      "tags": [
+        "always"
+      ],
       "items": [
         "Allergy spray",
-        "Nasal Spray",
         "Hair crap",
         "Toothbrush",
         "Toothpaste",
-        "Ibuprofen"
+        "Ibuprofen",
+        "Floss"
       ]
     },
     {
       "name": "Electronics Bag",
-      "tags": ["always"],
+      "tags": [
+        "always"
+      ],
       "items": [
         "Apple Watch charger",
         "iPhone charger",
@@ -58,7 +84,9 @@
     },
     {
       "name": "Before You Leave",
-      "tags": ["always"],
+      "tags": [
+        "always"
+      ],
       "items": [
         "Set thermostat to away",
         "Download movies to iPad",
@@ -69,7 +97,10 @@
     },
     {
       "name": "Summer / Swimming",
-      "tags": ["summer", "swimming"],
+      "tags": [
+        "summer",
+        "swimming"
+      ],
       "items": [
         "Bathing Suit",
         "Flip-flops",
@@ -79,28 +110,36 @@
     },
     {
       "name": "Day Pack",
-      "tags": ["always"],
+      "tags": [
+        "always"
+      ],
       "items": [
         "Day backpack"
       ]
     },
     {
       "name": "Airplane",
-      "tags": ["airplane"],
+      "tags": [
+        "airplane"
+      ],
       "items": [
         "Passport"
       ]
     },
     {
       "name": "Work Gear",
-      "tags": ["work"],
+      "tags": [
+        "work"
+      ],
       "items": [
         "Laptop / charger"
       ]
     },
     {
       "name": "Camping - Food",
-      "tags": ["camping"],
+      "tags": [
+        "camping"
+      ],
       "items": [
         "1L milk",
         "Kraft Dinner",
@@ -114,7 +153,9 @@
     },
     {
       "name": "Camping - Sleeping",
-      "tags": ["camping"],
+      "tags": [
+        "camping"
+      ],
       "items": [
         "Sleeping bag",
         "Air mattress",
@@ -126,7 +167,9 @@
     },
     {
       "name": "Camping - Misc",
-      "tags": ["camping"],
+      "tags": [
+        "camping"
+      ],
       "items": [
         "Lantern",
         "Sunscreen",
@@ -146,7 +189,9 @@
     },
     {
       "name": "Camping - Eating Gear",
-      "tags": ["camping"],
+      "tags": [
+        "camping"
+      ],
       "items": [
         "Utensils",
         "Cutting knife",

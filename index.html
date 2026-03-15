@@ -245,6 +245,46 @@
     margin-bottom: 16px;
   }
 
+  /* Tag pills */
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tag-pill.active {
+    border-color: var(--accent);
+    background: rgba(233,69,96,0.15);
+    color: var(--accent);
+  }
+
+  /* Category edit form (inline) */
+  .cat-edit-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .cat-edit-row label { font-size: 0.8em; color: var(--text-dim); white-space: nowrap; }
+  .cat-name-input {
+    flex: 1;
+    padding: 6px 8px;
+    background: var(--bg);
+    border: 1px solid var(--surface2);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 0.9em;
+  }
+  .cat-name-input:focus { outline: none; border-color: var(--accent); }
+
   /* New category form */
   .new-cat-form {
     background: var(--surface);
@@ -254,8 +294,8 @@
     display: none;
   }
   .new-cat-form.open { display: block; }
-  .new-cat-form label { display: block; margin-bottom: 4px; font-size: 0.85em; color: var(--text-dim); }
-  .new-cat-form input, .new-cat-form select {
+  .new-cat-form label { display: block; margin-bottom: 6px; font-size: 0.85em; color: var(--text-dim); }
+  .new-cat-form input {
     width: 100%;
     padding: 8px;
     background: var(--bg);
@@ -265,16 +305,16 @@
     font-size: 0.9em;
     margin-bottom: 12px;
   }
-  .tag-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .tag-checkboxes label {
+  .new-cat-form input:focus { outline: none; border-color: var(--accent); }
+  .new-cat-actions { display: flex; gap: 8px; }
+
+  .cat-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.05);
     display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.9em;
-    color: var(--text);
-    cursor: pointer;
+    justify-content: flex-end;
   }
-  .tag-checkboxes input[type="checkbox"] { display: inline; }
 
   .item-count { color: var(--text-dim); font-size: 0.85em; }
 </style>
@@ -317,10 +357,14 @@
 
   <div class="new-cat-form" id="new-cat-form">
     <label>Category Name</label>
-    <input type="text" id="new-cat-name" placeholder="e.g. Beach Gear">
+    <input type="text" id="new-cat-name" placeholder="e.g. Beach Gear"
+           onkeydown="if(event.key==='Enter')addCategory()">
     <label>Include when...</label>
-    <div class="tag-checkboxes" id="new-cat-tags"></div>
-    <button class="btn btn-small" onclick="addCategory()">Add Category</button>
+    <div class="tag-pills" id="new-cat-tags"></div>
+    <div class="new-cat-actions">
+      <button class="btn btn-small" onclick="addCategory()">Add Category</button>
+      <button class="btn btn-small" onclick="toggleNewCat()" style="background:var(--surface)">Cancel</button>
+    </div>
   </div>
 
   <div id="categories-list"></div>
@@ -439,6 +483,20 @@ async function sendToTodoist() {
 }
 
 // --- Editor ---
+function getAllTags() {
+  return ["always", ...data.questions.map(q => q.id)];
+}
+
+function renderTagPills(tags, ci) {
+  // ci is category index, or null for new-cat form
+  const allTags = getAllTags();
+  return allTags.map(t => {
+    const active = tags.includes(t) ? "active" : "";
+    const onclick = ci !== null ? `toggleCatTag(${ci},'${t}')` : `toggleNewCatTag('${t}')`;
+    return `<span class="tag-pill ${active}" onclick="${onclick}">${t}</span>`;
+  }).join("");
+}
+
 function renderEditor() {
   const el = document.getElementById("categories-list");
   el.innerHTML = data.categories.map((cat, ci) => `
@@ -451,6 +509,15 @@ function renderEditor() {
         <span class="category-tags">${cat.tags.join(", ")}</span>
       </div>
       <div class="category-body" id="cat-body-${ci}">
+        <div class="cat-edit-row">
+          <label>Name:</label>
+          <input class="cat-name-input" value="${cat.name}"
+                 onchange="updateCatName(${ci}, this.value)">
+        </div>
+        <div class="cat-edit-row" style="flex-wrap:wrap">
+          <label>Tags:</label>
+          <div class="tag-pills" style="margin-bottom:0">${renderTagPills(cat.tags, ci)}</div>
+        </div>
         ${cat.items.map((item, ii) => `
           <div class="item-row">
             <input class="item-text" value="${item}" onchange="updateItem(${ci}, ${ii}, this.value)">
@@ -462,19 +529,49 @@ function renderEditor() {
                  onkeydown="if(event.key==='Enter')addItem(${ci})">
           <button class="btn btn-small" onclick="addItem(${ci})">Add</button>
         </div>
-        <div style="margin-top:12px; display:flex; justify-content:flex-end">
+        <div class="cat-footer">
           <button class="btn btn-small btn-danger" onclick="removeCategory(${ci})">Delete Category</button>
         </div>
       </div>
     </div>
   `).join("");
 
-  // New category tag checkboxes
+  // New category tag pills
+  renderNewCatTags();
+}
+
+let newCatSelectedTags = [];
+
+function renderNewCatTags() {
   const tagsEl = document.getElementById("new-cat-tags");
-  const allTags = ["always", ...data.questions.map(q => q.id)];
-  tagsEl.innerHTML = allTags.map(t => `
-    <label><input type="checkbox" value="${t}"> ${t}</label>
-  `).join("");
+  if (!tagsEl) return;
+  tagsEl.innerHTML = renderTagPills(newCatSelectedTags, null);
+}
+
+function toggleNewCatTag(tag) {
+  const i = newCatSelectedTags.indexOf(tag);
+  if (i >= 0) newCatSelectedTags.splice(i, 1);
+  else newCatSelectedTags.push(tag);
+  renderNewCatTags();
+}
+
+async function toggleCatTag(ci, tag) {
+  const cat = data.categories[ci];
+  const i = cat.tags.indexOf(tag);
+  if (i >= 0) {
+    if (cat.tags.length <= 1) return; // must have at least one tag
+    cat.tags.splice(i, 1);
+  } else {
+    cat.tags.push(tag);
+  }
+  await saveData();
+  renderEditor();
+  document.getElementById(`cat-body-${ci}`).classList.add("open");
+}
+
+async function updateCatName(ci, val) {
+  data.categories[ci].name = val;
+  await saveData();
 }
 
 function toggleCat(ci) {
@@ -510,12 +607,11 @@ function toggleNewCat() {
 
 async function addCategory() {
   const name = document.getElementById("new-cat-name").value.trim();
-  const tags = [...document.querySelectorAll("#new-cat-tags input:checked")].map(el => el.value);
-  if (!name || tags.length === 0) return alert("Need a name and at least one tag.");
-  data.categories.push({ name, tags, items: [] });
+  if (!name || newCatSelectedTags.length === 0) return alert("Need a name and at least one tag.");
+  data.categories.push({ name, tags: [...newCatSelectedTags], items: [] });
   await saveData();
   document.getElementById("new-cat-name").value = "";
-  document.querySelectorAll("#new-cat-tags input").forEach(el => el.checked = false);
+  newCatSelectedTags = [];
   document.getElementById("new-cat-form").classList.remove("open");
   renderEditor();
 }
