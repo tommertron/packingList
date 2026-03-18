@@ -8,7 +8,9 @@ import uuid
 import urllib.request
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_FILE = os.path.join(SCRIPT_DIR, "packing.json")
+_local = os.path.join(SCRIPT_DIR, "packing.json")
+_template = os.path.join(SCRIPT_DIR, "packing.template.json")
+JSON_FILE = _local if os.path.exists(_local) else _template
 
 # Load .env
 env_path = os.path.join(SCRIPT_DIR, ".env")

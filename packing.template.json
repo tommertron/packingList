@@ -59,8 +59,8 @@
         "always"
       ],
       "items": [
-        "Allergy spray",
-        "Hair crap",
+        "Medications",
+        "Hair products",
         "Toothbrush",
         "Toothpaste",
         "Ibuprofen",
@@ -89,8 +89,7 @@
       ],
       "items": [
         "Set thermostat to away",
-        "Download movies to iPad",
-        "Download google maps offline",
+        "Download offline maps",
         "Run dishwasher",
         "Empty garbages"
       ]

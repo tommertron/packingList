@@ -10,7 +10,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_FILE = os.path.join(SCRIPT_DIR, "packing.json")
+_local = os.path.join(SCRIPT_DIR, "packing.json")
+_template = os.path.join(SCRIPT_DIR, "packing.template.json")
+JSON_FILE = _local if os.path.exists(_local) else _template
 HTML_FILE = os.path.join(SCRIPT_DIR, "index.html")
 
 # Load .env
