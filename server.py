@@ -127,6 +127,9 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/data":
             self._send_json(load_data())
 
+        elif path == "/api/key":
+            self._send_json({"set": bool(API_KEY), "key": API_KEY})
+
         else:
             self.send_error(404)
 
@@ -136,6 +139,22 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/data":
             data = self._read_body()
             save_data(data)
+            self._send_json({"ok": True})
+
+        elif path == "/api/key":
+            body = self._read_body()
+            key = body.get("key", "").strip()
+            env_path = os.path.join(SCRIPT_DIR, ".env")
+            lines = []
+            if os.path.exists(env_path):
+                with open(env_path) as f:
+                    lines = [l for l in f.readlines() if not l.startswith("TODOIST_API_KEY=")]
+            lines.append(f"TODOIST_API_KEY={key}\n")
+            with open(env_path, "w") as f:
+                f.writelines(lines)
+            global API_KEY
+            API_KEY = key
+            os.environ["TODOIST_API_KEY"] = key
             self._send_json({"ok": True})
 
         elif path == "/api/send":

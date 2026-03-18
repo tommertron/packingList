@@ -317,6 +317,35 @@
   }
 
   .item-count { color: var(--text-dim); font-size: 0.85em; }
+
+  /* Settings */
+  .settings-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .settings-card h2 { font-size: 1.1em; margin-bottom: 6px; }
+  .settings-card p { color: var(--text-dim); font-size: 0.9em; margin-bottom: 16px; line-height: 1.5; }
+  .settings-card a { color: var(--accent); }
+  .key-row {
+    display: flex;
+    gap: 8px;
+  }
+  .key-row input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 2px solid var(--surface2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.95em;
+    font-family: monospace;
+  }
+  .key-row input:focus { outline: none; border-color: var(--accent); }
+  .key-status { margin-top: 10px; font-size: 0.85em; }
+  .key-status.set { color: var(--green); }
+  .key-status.unset { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -327,6 +356,7 @@
 <div class="tabs">
   <button class="tab active" onclick="switchTab('trip')">Trip Builder</button>
   <button class="tab" onclick="switchTab('editor')">Manage Items</button>
+  <button class="tab" onclick="switchTab('settings')">Settings</button>
 </div>
 
 <!-- Trip Builder Panel -->
@@ -370,6 +400,26 @@
   <div id="categories-list"></div>
 </div>
 
+<!-- Settings Panel -->
+<div id="settings-panel" class="panel">
+  <div class="settings-card">
+    <h2>Todoist API Key</h2>
+    <p>
+      Required to send your packing list to Todoist.<br>
+      Get your key from
+      <a href="https://app.todoist.com/app/settings/integrations/developer" target="_blank">
+        Todoist Settings → Integrations → Developer
+      </a>.
+    </p>
+    <div class="key-row">
+      <input type="password" id="api-key-input" placeholder="Paste your API key here">
+      <button class="btn btn-small" onclick="toggleKeyVis()">Show</button>
+      <button class="btn btn-primary" style="width:auto" onclick="saveKey()">Save</button>
+    </div>
+    <div class="key-status" id="key-status"></div>
+  </div>
+</div>
+
 <script>
 let data = { questions: [], categories: [] };
 
@@ -391,13 +441,14 @@ async function saveData() {
 
 // --- Tabs ---
 function switchTab(tab) {
-  document.querySelectorAll(".tab").forEach((t, i) => {
-    t.classList.toggle("active", (tab === "trip" && i === 0) || (tab === "editor" && i === 1));
+  const tabs = ["trip", "editor", "settings"];
+  document.querySelectorAll(".tab").forEach((t, i) => t.classList.toggle("active", tabs[i] === tab));
+  tabs.forEach(t => {
+    document.getElementById(`${t}-panel`).classList.toggle("active", t === tab);
   });
-  document.getElementById("trip-panel").classList.toggle("active", tab === "trip");
-  document.getElementById("editor-panel").classList.toggle("active", tab === "editor");
   if (tab === "trip") renderPreview();
   if (tab === "editor") renderEditor();
+  if (tab === "settings") loadKey();
 }
 
 // --- Trip Builder ---
@@ -621,6 +672,42 @@ async function removeCategory(ci) {
   data.categories.splice(ci, 1);
   await saveData();
   renderEditor();
+}
+
+// --- Settings ---
+async function loadKey() {
+  const resp = await fetch("/api/key");
+  const { set, key } = await resp.json();
+  const input = document.getElementById("api-key-input");
+  const status = document.getElementById("key-status");
+  if (set) {
+    input.value = key;
+    status.className = "key-status set";
+    status.textContent = "API key is saved.";
+  } else {
+    input.value = "";
+    status.className = "key-status unset";
+    status.textContent = "No API key saved yet.";
+  }
+}
+
+function toggleKeyVis() {
+  const input = document.getElementById("api-key-input");
+  const btn = input.nextElementSibling;
+  if (input.type === "password") { input.type = "text"; btn.textContent = "Hide"; }
+  else { input.type = "password"; btn.textContent = "Show"; }
+}
+
+async function saveKey() {
+  const key = document.getElementById("api-key-input").value.trim();
+  const status = document.getElementById("key-status");
+  await fetch("/api/key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key }),
+  });
+  status.className = "key-status set";
+  status.textContent = key ? "API key saved." : "API key cleared.";
 }
 
 loadData();
