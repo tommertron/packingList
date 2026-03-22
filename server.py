@@ -10,22 +10,10 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_local = os.path.join(SCRIPT_DIR, "packing.json")
-_template = os.path.join(SCRIPT_DIR, "packing.template.json")
-JSON_FILE = _local if os.path.exists(_local) else _template
+JSON_FILE = os.path.join(SCRIPT_DIR, "packing.template.json")
 HTML_FILE = os.path.join(SCRIPT_DIR, "index.html")
+CSS_FILE = os.path.join(SCRIPT_DIR, "coefficiencies.css")
 
-# Load .env
-env_path = os.path.join(SCRIPT_DIR, ".env")
-if os.path.exists(env_path):
-    with open(env_path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                key, val = line.split("=", 1)
-                os.environ[key.strip()] = val.strip()
-
-API_KEY = os.environ.get("TODOIST_API_KEY", "")
 SYNC_URL = "https://api.todoist.com/api/v1/sync"
 
 
@@ -34,13 +22,7 @@ def load_data():
         return json.load(f)
 
 
-def save_data(data):
-    with open(JSON_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-        f.write("\n")
-
-
-def send_to_todoist(task_name, selected_tags):
+def send_to_todoist(task_name, selected_tags, api_key):
     data = load_data()
     commands = []
 
@@ -81,7 +63,7 @@ def send_to_todoist(task_name, selected_tags):
         SYNC_URL,
         data=req_data,
         headers={
-            "Authorization": f"Bearer {API_KEY}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         },
     )
@@ -124,11 +106,17 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
 
+        elif path == "/coefficiencies.css":
+            with open(CSS_FILE, "rb") as f:
+                body = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/css")
+            self.send_header("Content-Length", len(body))
+            self.end_headers()
+            self.wfile.write(body)
+
         elif path == "/api/data":
             self._send_json(load_data())
-
-        elif path == "/api/key":
-            self._send_json({"set": bool(API_KEY), "key": API_KEY})
 
         else:
             self.send_error(404)
@@ -136,33 +124,16 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         path = urlparse(self.path).path
 
-        if path == "/api/data":
-            data = self._read_body()
-            save_data(data)
-            self._send_json({"ok": True})
-
-        elif path == "/api/key":
-            body = self._read_body()
-            key = body.get("key", "").strip()
-            env_path = os.path.join(SCRIPT_DIR, ".env")
-            lines = []
-            if os.path.exists(env_path):
-                with open(env_path) as f:
-                    lines = [l for l in f.readlines() if not l.startswith("TODOIST_API_KEY=")]
-            lines.append(f"TODOIST_API_KEY={key}\n")
-            with open(env_path, "w") as f:
-                f.writelines(lines)
-            global API_KEY
-            API_KEY = key
-            os.environ["TODOIST_API_KEY"] = key
-            self._send_json({"ok": True})
-
-        elif path == "/api/send":
+        if path == "/api/send":
             body = self._read_body()
             task_name = body.get("task_name", "Packing")
             selected_tags = body.get("tags", [])
+            api_key = body.get("api_key", "").strip()
+            if not api_key:
+                self._send_json({"error": "No API key provided."}, 400)
+                return
             try:
-                result = send_to_todoist(task_name, selected_tags)
+                result = send_to_todoist(task_name, selected_tags, api_key)
                 self._send_json(result)
             except Exception as e:
                 self._send_json({"error": str(e)}, 500)
@@ -172,7 +143,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8420
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8420))
     server = HTTPServer(("0.0.0.0", port), Handler)
     print(f"Packing list app running at http://localhost:{port}")
     try:
